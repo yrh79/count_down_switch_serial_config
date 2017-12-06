@@ -31,7 +31,7 @@ All-open - Read configuration from EEPROM.
 * 0x101 - 2.5 hours (jumpper set on pin 4 and 6)
 
 ### Initial switching delay:
-The switch would do a switch off-on action 11 hours after the initial power on - this is to allow people setup the power supply (e.g.) on 2pm in the afternoon, then the first (and every power cycle) action would happen at 1am in the mid-night.
+The switch would do a switch off-on action 11 hours (configuable, see below) after the initial power on - this is to allow people setup the power supply (e.g.) on 2pm in the afternoon, then the first (and every power cycle) action would happen at 1am in the mid-night.
 
 ### Serial Configuration
 * To configure the initial delay value, use the below command:
