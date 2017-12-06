@@ -45,6 +45,11 @@ This would set the initial delay value to 11 hours.
 $cycle {0, 1, 0, 0}
 This would set the interval value to 1 hour.
 ```
+* To check the initial/interval value from EEPROM, use the below command:
+```
+$get
+The device would echo back the initial delay value and the interval value saved in the EEPROM.
+```
 
 ### Basic Usage
 
