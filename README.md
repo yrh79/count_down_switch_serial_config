@@ -23,7 +23,7 @@ This count down switch could switch off then back on the power suply of the powe
 * pin 9 - 48 hours,
 
 ### Default setup:
-All-open - 24 hours (default value)
+All-open - Read configuration from EEPROM.
 
 ### Bit-setup:
 1 bit equals to 30 minutes, e.g.:
