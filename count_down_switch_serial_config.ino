@@ -3,7 +3,7 @@
 
 Timer t;
 
-int ledEvent;
+int ledEvent = -1;
 
 typedef struct {
   int day;
@@ -52,12 +52,34 @@ typedef enum {
   CYCLE = 1
 } config_type_t;
 
+typedef enum {
+  NORMAL = 0,
+  FLASH = 1
+} flash_state_t;
+
+flash_state_t flashState = NORMAL;
+int flashBool = 0;
+int tickCounter = 10;
+
 void setup()
 {
   //initialize countdown to 11 hours at the first boot
   countdown = getConfig(INIT);
 
+  //setup default cycle and initial delay values
+  //this is for brand new chips
+  if (countdown.day == -1 &&
+      countdown.hour == -1 &&
+      countdown.minute == -1 &&
+      countdown.second == -1) {
+    countdown = {0, 11, 0, 0};
+    saveConfig(INIT, &countdown);
+    countdown = {1, 0, 0, 0};
+    saveConfig(CYCLE, &countdown);
+  }
+
   Serial.begin(115200);
+  Serial.println("Auto Switch initialized...");
 
   //switch on powerPin to indicate the device is working
   //then switch off to indicate the devides is in action
@@ -68,12 +90,11 @@ void setup()
   delay(1000);
   switchOff();
 
-  int tickEvent = t.every(1000, doCountDown);
+  int tickEvent = t.every(100, doCountDown);
 
   pinMode(ledPin, OUTPUT);
-  ledEvent = t.oscillate(ledPin, 50, HIGH);
-
-  int afterEvent = t.after(switch_seconds * 1000, slowDownLed_switchOn);
+  flashState = FLASH;
+  t.after(switch_seconds * 1000, slowDownLed_switchOn);
 
   //set pull down resisters for configuration pins
   pinMode(bit1_pin, OUTPUT);
@@ -217,8 +238,30 @@ void saveConfig(config_type_t type, time_t *configData)
   }
 }
 
+void flashIt()
+{
+  digitalWrite(ledPin, flashBool);
+  if (flashBool) {
+    flashBool = 0;
+  } else {
+    flashBool = 1;
+  }
+}
+
 void doCountDown()
 {
+  if (tickCounter > 0) {
+    tickCounter --;
+    if (flashState == FLASH) {
+      flashIt();
+    }
+    return;
+  } else {
+    tickCounter = 10;
+  }
+
+  flashIt();
+
   time_t *c = &countdown;
   char buf[64] = {0};
   sprintf(buf, "TTR: %d D %d:%d:%d", c->day, c->hour, c->minute, c->second);
@@ -240,26 +283,23 @@ void doCountDown()
     countdown.second = 59;
   } else {
     //count down is completed, do poweroff action for the consumer
-
-    //flash led to indicate action
-    ledEvent = t.oscillate(ledPin, 50, HIGH);
-
+    flashState = FLASH;
     switchOff();
 
     //read hardware setup to determine cycle here:
     readConfig();
 
     //slow down led to indicate normal operation after 5 seconds and switch On
-    t.after(switch_seconds * 1000, slowDownLed_switchOn);
+    int a = t.after(switch_seconds * 1000, slowDownLed_switchOn);
 
+//    Serial.print("afterEvent = ");
+//    Serial.println(a);
   }
 }
 
 void slowDownLed_switchOn()
 {
-  t.stop(ledEvent);
-  t.oscillate(ledPin, 500, HIGH);
-
+  flashState = NORMAL;
   switchOn();
 }
 
