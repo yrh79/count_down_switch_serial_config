@@ -22,6 +22,7 @@ const int ledPin = 13;
 
 //GPIO pin for configuration
 const int num_config_bits = 6;
+const int refPin   = 3;
 const int bit1_pin = 4;
 const int bit2_pin = 5;
 const int bit3_pin = 6;
@@ -71,11 +72,15 @@ void setup()
   int tickEvent = t.every(1000, doCountDown);
 
   pinMode(ledPin, OUTPUT);
+  pinMode(refPin, OUTPUT);
   ledEvent = t.oscillate(ledPin, 50, HIGH);
 
   int afterEvent = t.after(switch_seconds * 1000, slowDownLed_switchOn);
 
-  //set pull down resisters for configuration pins
+  //set reference Pin to LOW
+  digitalWrite(refPin, LOW);
+
+  //set pull up resisters for configuration pins
   pinMode(bit1_pin, OUTPUT);
   pinMode(bit2_pin, OUTPUT);
   pinMode(bit3_pin, OUTPUT);
@@ -83,12 +88,12 @@ void setup()
   pinMode(bit5_pin, OUTPUT);
   pinMode(bit6_pin, OUTPUT);
 
-  digitalWrite(bit1_pin, LOW);
-  digitalWrite(bit2_pin, LOW);
-  digitalWrite(bit3_pin, LOW);
-  digitalWrite(bit4_pin, LOW);
-  digitalWrite(bit5_pin, LOW);
-  digitalWrite(bit6_pin, LOW);
+  digitalWrite(bit1_pin, HIGH);
+  digitalWrite(bit2_pin, HIGH);
+  digitalWrite(bit3_pin, HIGH);
+  digitalWrite(bit4_pin, HIGH);
+  digitalWrite(bit5_pin, HIGH);
+  digitalWrite(bit6_pin, HIGH);
 
   pinMode(bit1_pin, INPUT);
   pinMode(bit2_pin, INPUT);
@@ -297,12 +302,12 @@ void readConfig()
 {
   configuration = 0;
 
-  if (digitalRead(bit1_pin)) configuration |= 0x1;
-  if (digitalRead(bit2_pin)) configuration |= 0x1 << 1;
-  if (digitalRead(bit3_pin)) configuration |= 0x1 << 2;
-  if (digitalRead(bit4_pin)) configuration |= 0x1 << 3;
-  if (digitalRead(bit5_pin)) configuration |= 0x1 << 4;
-  if (digitalRead(bit6_pin)) configuration |= 0x1 << 5;
+  if (digitalRead(bit1_pin) == 0) configuration |= 0x1;
+  if (digitalRead(bit2_pin) == 0) configuration |= 0x1 << 1;
+  if (digitalRead(bit3_pin) == 0) configuration |= 0x1 << 2;
+  if (digitalRead(bit4_pin) == 0) configuration |= 0x1 << 3;
+  if (digitalRead(bit5_pin) == 0) configuration |= 0x1 << 4;
+  if (digitalRead(bit6_pin) == 0) configuration |= 0x1 << 5;
 
   if (is_quick_config(configuration)) {
     //quick config:
