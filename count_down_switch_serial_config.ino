@@ -97,30 +97,17 @@ void setup()
   flashState = FLASH;
   t.after(switch_seconds * 1000, slowDownLed_switchOn);
 
-  //set reference Pin to LOW
-  digitalWrite(refPin, LOW);
-
   //set pull up resisters for configuration pins
-  pinMode(bit1_pin, OUTPUT);
-  pinMode(bit2_pin, OUTPUT);
-  pinMode(bit3_pin, OUTPUT);
-  pinMode(bit4_pin, OUTPUT);
-  pinMode(bit5_pin, OUTPUT);
-  pinMode(bit6_pin, OUTPUT);
+  pinMode(bit1_pin, INPUT_PULLUP);
+  pinMode(bit2_pin, INPUT_PULLUP);
+  pinMode(bit3_pin, INPUT_PULLUP);
+  pinMode(bit4_pin, INPUT_PULLUP);
+  pinMode(bit5_pin, INPUT_PULLUP);
+  pinMode(bit6_pin, INPUT_PULLUP);
 
-  digitalWrite(bit1_pin, HIGH);
-  digitalWrite(bit2_pin, HIGH);
-  digitalWrite(bit3_pin, HIGH);
-  digitalWrite(bit4_pin, HIGH);
-  digitalWrite(bit5_pin, HIGH);
-  digitalWrite(bit6_pin, HIGH);
-
-  pinMode(bit1_pin, INPUT);
-  pinMode(bit2_pin, INPUT);
-  pinMode(bit3_pin, INPUT);
-  pinMode(bit4_pin, INPUT);
-  pinMode(bit5_pin, INPUT);
-  pinMode(bit6_pin, INPUT);
+  //set reference Pin to LOW
+  pinMode(refPin, OUTPUT);
+  digitalWrite(refPin, LOW);
 
 }
 
@@ -341,12 +328,12 @@ void readConfig()
 {
   configuration = 0;
 
-  if (digitalRead(bit1_pin) == 0) configuration |= 0x1;
-  if (digitalRead(bit2_pin) == 0) configuration |= 0x1 << 1;
-  if (digitalRead(bit3_pin) == 0) configuration |= 0x1 << 2;
-  if (digitalRead(bit4_pin) == 0) configuration |= 0x1 << 3;
-  if (digitalRead(bit5_pin) == 0) configuration |= 0x1 << 4;
-  if (digitalRead(bit6_pin) == 0) configuration |= 0x1 << 5;
+  if (!digitalRead(bit1_pin)) configuration |= 0x1;
+  if (!digitalRead(bit2_pin)) configuration |= 0x1 << 1;
+  if (!digitalRead(bit3_pin)) configuration |= 0x1 << 2;
+  if (!digitalRead(bit4_pin)) configuration |= 0x1 << 3;
+  if (!digitalRead(bit5_pin)) configuration |= 0x1 << 4;
+  if (!digitalRead(bit6_pin)) configuration |= 0x1 << 5;
 
   if (is_quick_config(configuration)) {
     //quick config:
